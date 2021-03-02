@@ -1,0 +1,198 @@
+---
+title: "Atlas de Buceo de México"
+resource_files:
+- "shp/Diving_sites_v1.0_01032021/dive_sites.shx"
+- "shp/Diving_sites_v1.0_01032021/dive_sites.prj"
+- "shp/Diving_sites_v1.0_01032021/dive_sites.dbf"
+- "shp/Diving_sites_v1.0_01032021/dive_sites.cpg"
+- "shp/Tourism_operators_v1.0_01032021/operators.cpg"
+- "shp/Tourism_operators_v1.0_01032021/operators.dbf"
+- "shp/Tourism_operators_v1.0_01032021/operators.prj"
+- "shp/Tourism_operators_v1.0_01032021/operators.qpj"
+- "shp/Tourism_operators_v1.0_01032021/operators.shx"
+- "shp/MPA_MX_v1.0_01032021/final_mpa_layer.shx" 
+- "shp/MPA_MX_v1.0_01032021/final_mpa_layer.prj" 
+- "shp/MPA_MX_v1.0_01032021/final_mpa_layer.dbf" 
+- "shp/MPA_MX_v1.0_01032021/final_mpa_layer.cpg" 
+
+runtime: shiny
+output:
+        flexdashboard::flex_dashboard:
+        source_code: embed
+        theme: united
+---
+        
+Atlas de Buceo de México
+=======================================================================
+        
+```{r setup, include=FALSE}
+
+library(flexdashboard)
+library(leaflet)
+library(raster)
+library(mapview)
+library(rgdal)
+library(sf)
+library(tidyverse)
+library(ggthemes)
+
+
+# Loading diving site data and diving operators data ----------------
+
+ds <- shapefile("shp/Diving_sites_v1.0_01032021/dive_sites.shp", verbose = FALSE)
+to <- shapefile("shp/Tourism_operators_v1.0_01032021/operators.shp", verbose = FALSE)
+
+# Loading MPA layer -------------------
+
+mpa_layer <- st_read("shp/MPA_MX_v1.0_01032021/final_mpa_layer.shp") %>% 
+        select(ANP, ID)
+
+
+mpa_metadata <- read.csv("data/MPA_metadata_v.1.0_01032021.csv", na.strings = "") # MPA metadata
+
+final_mpa <- merge(mpa_layer, mpa_metadata, by = c("ID", "ANP")) %>%
+        
+        mutate(Pesca = replace_na(Pesca, "NA"),
+               Buceo = replace_na(Buceo, "NA")) %>%
+        mutate(
+                Pesca = factor(
+                        Pesca,
+                        levels = c("NA", "ND", "NO", "SI"),
+                        labels = c("Sin manejo", "No especificado", "Prohibida",
+                                   "Permitida")
+                ),
+                Buceo = factor(
+                        Buceo,
+                        levels = c("NA", "ND", "NO", "SI"),
+                        labels = c("Sin manejo", "No especificado", "Prohibido", "Permitido")
+                )
+        )
+
+
+final_mpa <- st_zm(final_mpa, drop = TRUE, what = "ZM")
+
+
+mpa <- as(final_mpa, "Spatial")
+
+```
+
+
+```{r}
+
+to$labels1 <- paste0("<strong> Región: </strong> ", to$region, "<br/> ",
+                     "<strong> Estado: </strong> ", to$state, "<br/> ",
+                     "<strong> Nombre: </strong> ", to$company_na, "<br/> ",
+                     "<strong> Latitud: </strong> ", to$lat, "<br/> ",
+                     "<strong> Longitud: </strong> ", to$LONG, "<br/> ",
+                     "<strong> Dirección: </strong> ", to$long, "<br/> ",
+                     "<strong> Telefono: </strong> ", to$phone, "<br/> ",
+                     "<strong> Correo: </strong> ", to$email, "<br/> ") %>%
+        lapply(htmltools::HTML)
+
+ds$labels2 <- paste0("<strong> Nombre sitio: </strong> ", ds$site_name, "<br/> ",
+                     "<strong> Región: </strong> ", ds$region, "<br/> ",
+                     "<strong> Localidad: </strong> ", ds$locality, "<br/> ",
+                     "<strong> Estado: </strong> ", ds$state, "<br/> ",
+                     "<strong> Popularidad: </strong> ", ds$popularity, "<br/> ",
+                     "<strong> Latitud: </strong> ", ds$latitude, "<br/> ",
+                     "<strong> Longitud: </strong> ", ds$longitude, "<br/> ") %>%
+        lapply(htmltools::HTML)
+
+
+mpa$labels3 <- paste0("<strong> Name: </strong> ", mpa$ANP, "<br/> ",
+                      "<strong> Plan de Manejo: </strong> ", mpa$PM_link, "<br/> ",
+                      "<strong> Fecha: </strong> ", mpa$FECHA, "<br/> ",
+                      "<strong> Zona: </strong> ", mpa$Categoria, "<br/> ",
+                      "<strong> Subzona </strong> ", mpa$Subzonific, "<br/> ",
+                      "<strong> Buceo: </strong> ", mpa$Buceo, "<br/> ",
+                      "<strong> Pesca: </strong> ", mpa$Pesca, "<br/> ") %>%
+        lapply(htmltools::HTML)
+
+
+icons <- awesomeIcons(
+        icon = 'flag-outline',
+        iconColor = 'black',
+        library = 'ion')
+
+
+leaflet(to) %>%
+        addProviderTiles(providers$Esri.WorldImagery, group = "Satélite") %>%
+        addProviderTiles(providers$Esri.WorldTopoMap, group = "Mapa") %>%
+        addProviderTiles(providers$Esri.OceanBasemap, group = "Ocean") %>%
+
+        setView(lng = -108, lat = 25, zoom = 2) %>%
+        addAwesomeMarkers(
+                popup = ~ labels1,
+                group = "Operators",
+                icon = awesomeIcons(icon = "home",
+                                    markerColor = "darkred",
+                                    library = "ion")
+        ) %>%
+        addPolygons(
+                data = mpa,
+                group = "AMPs",
+                weight = 2,
+                opacity = 1,
+                fillColor = "red",
+                fillOpacity = 0.1,
+                color = "black",
+                dashArray = "3",
+                highlightOptions = highlightOptions(
+                        color = "white",
+                        weight = 2,
+                        bringToFront = TRUE
+                ),
+                popup = ~ labels3
+        ) %>%
+        addMarkers(
+                data = ds, 
+                group = "Diving sites",
+                popup = ~ labels2
+        ) %>% 
+        # Layers control
+        addLayersControl(
+                baseGroups = c("Satélite", "Mapa", "Ocean"),
+                overlayGroups = c("Operators", "AMPs", "Diving sites"),
+                options = layersControlOptions(collapsed = TRUE)
+        ) %>%
+        hideGroup(c("Operators", "Diving sites")) %>%
+        setView(lng = -99.1332,
+                lat = 19.4326,
+                zoom = 4)
+
+
+```
+
+
+
+
+Credits
+=======================================================================
+        
+### About the project
+
+This work is part of the diving atlas initiative in Mexico, a project where international institutions are collaborating: the Scripps Institution of Oceanography (USA), the Gulf of California Marina Program (USA), the Centro para la Biodiversidad Marina y la Conservación, A.C. (México), the Universidad Autónoma de Baja California Sur (México), the Senckenberg Institute (Germany). 
+
+### Data sources
+
+- Mexican MPA layer is currently under development, original data from: http://sig.conanp.gob.mx/website/pagsig/info_shape.htm
+
+
+### Dashboard, data creation and supervision: 
+
+- Dr. Fabio Favoretto (UABCS-CBMC);
+
+### Data creation:
+
+- Joy Kumagai (Senckenberg);
+- Terrance Wang (NOAA);
+- Norman Blanco Lupio (CBMC);
+- Eduardo León Solórzano (UABCS);
+- Eduardo Peláez Torres (UABCS);
+
+### Project supervision: 
+
+- Marisol Placencia de la Cruz (CBMC); 
+- Octavio Aburto Oropeza (SIO); 
+- Catalina López Sagastégui (UC-Mexus);
+
