@@ -41,7 +41,6 @@ ds <- raster::shapefile("shp/Diving_sites_v1.0_01032021/dive_sites.shp", verbose
 to <- raster::shapefile("shp/Tourism_operators_v1.0_01032021/operators.shp", verbose = FALSE)
 
 # Loading MPA layer -------------------
-
 mpa <- raster::shapefile("shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.shp", encoding = "latin1")
 
 ```
