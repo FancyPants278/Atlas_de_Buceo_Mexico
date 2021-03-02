@@ -10,10 +10,9 @@ resource_files:
 - "shp/Tourism_operators_v1.0_01032021/operators.prj"
 - "shp/Tourism_operators_v1.0_01032021/operators.qpj"
 - "shp/Tourism_operators_v1.0_01032021/operators.shx"
-- "shp/MPA_MX_v1.0_01032021/final_mpa_layer.shx" 
-- "shp/MPA_MX_v1.0_01032021/final_mpa_layer.prj" 
-- "shp/MPA_MX_v1.0_01032021/final_mpa_layer.dbf" 
-- "shp/MPA_MX_v1.0_01032021/final_mpa_layer.cpg" 
+- "shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.shx" 
+- "shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.prj" 
+- "shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.dbf" 
 
 runtime: shiny
 output:
@@ -29,7 +28,6 @@ Atlas de Buceo de México
 
 library(flexdashboard)
 library(leaflet)
-library(raster)
 library(mapview)
 library(rgdal)
 library(sf)
@@ -39,40 +37,12 @@ library(ggthemes)
 
 # Loading diving site data and diving operators data ----------------
 
-ds <- shapefile("shp/Diving_sites_v1.0_01032021/dive_sites.shp", verbose = FALSE)
-to <- shapefile("shp/Tourism_operators_v1.0_01032021/operators.shp", verbose = FALSE)
+ds <- raster::shapefile("shp/Diving_sites_v1.0_01032021/dive_sites.shp", verbose = FALSE)
+to <- raster::shapefile("shp/Tourism_operators_v1.0_01032021/operators.shp", verbose = FALSE)
 
 # Loading MPA layer -------------------
 
-mpa_layer <- st_read("shp/MPA_MX_v1.0_01032021/final_mpa_layer.shp") %>% 
-        select(ANP, ID)
-
-
-mpa_metadata <- read.csv("data/MPA_metadata_v.1.0_01032021.csv", na.strings = "") # MPA metadata
-
-final_mpa <- merge(mpa_layer, mpa_metadata, by = c("ID", "ANP")) %>%
-        
-        mutate(Pesca = replace_na(Pesca, "NA"),
-               Buceo = replace_na(Buceo, "NA")) %>%
-        mutate(
-                Pesca = factor(
-                        Pesca,
-                        levels = c("NA", "ND", "NO", "SI"),
-                        labels = c("Sin manejo", "No especificado", "Prohibida",
-                                   "Permitida")
-                ),
-                Buceo = factor(
-                        Buceo,
-                        levels = c("NA", "ND", "NO", "SI"),
-                        labels = c("Sin manejo", "No especificado", "Prohibido", "Permitido")
-                )
-        )
-
-
-final_mpa <- st_zm(final_mpa, drop = TRUE, what = "ZM")
-
-
-mpa <- as(final_mpa, "Spatial")
+mpa <- raster::shapefile("shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.shp", encoding = "latin1")
 
 ```
 
@@ -102,8 +72,8 @@ ds$labels2 <- paste0("<strong> Nombre sitio: </strong> ", ds$site_name, "<br/> "
 mpa$labels3 <- paste0("<strong> Name: </strong> ", mpa$ANP, "<br/> ",
                       "<strong> Plan de Manejo: </strong> ", mpa$PM_link, "<br/> ",
                       "<strong> Fecha: </strong> ", mpa$FECHA, "<br/> ",
-                      "<strong> Zona: </strong> ", mpa$Categoria, "<br/> ",
-                      "<strong> Subzona </strong> ", mpa$Subzonific, "<br/> ",
+                      "<strong> Zona: </strong> ", mpa$Categor, "<br/> ",
+                      "<strong> Subzona </strong> ", mpa$Subznfc, "<br/> ",
                       "<strong> Buceo: </strong> ", mpa$Buceo, "<br/> ",
                       "<strong> Pesca: </strong> ", mpa$Pesca, "<br/> ") %>%
         lapply(htmltools::HTML)
