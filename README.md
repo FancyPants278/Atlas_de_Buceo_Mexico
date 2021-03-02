@@ -1,4 +1,4 @@
-# Atlas_de_Buceo_Mexico
+# Atlas de Buceo Mexico
 
 ### About the project
 
