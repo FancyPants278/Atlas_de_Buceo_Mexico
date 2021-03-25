@@ -102,10 +102,10 @@ leaflet(to) %>%
                 group = "AMPs",
                 weight = 2,
                 opacity = 1,
-                fillColor = "red",
+                fillColor = "white",
                 fillOpacity = 0.1,
                 color = "black",
-               #dashArray = "3",
+                dashArray = "2",
                 highlightOptions = highlightOptions(
                         color = "white",
                         weight = 2,
