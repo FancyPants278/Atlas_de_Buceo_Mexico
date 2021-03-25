@@ -105,7 +105,7 @@ leaflet(to) %>%
                 fillColor = "red",
                 fillOpacity = 0.1,
                 color = "black",
-                dashArray = "3",
+               #dashArray = "3",
                 highlightOptions = highlightOptions(
                         color = "white",
                         weight = 2,
