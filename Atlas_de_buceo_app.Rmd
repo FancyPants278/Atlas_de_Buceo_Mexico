@@ -33,6 +33,7 @@ library(rgdal)
 library(sf)
 library(tidyverse)
 library(ggthemes)
+library(viridis)
 
 
 # Loading diving site data and diving operators data ----------------
@@ -48,33 +49,39 @@ mpa <- raster::shapefile("shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.shp", encoding = 
 
 ```{r}
 
-to$labels1 <- paste0("<strong> Región: </strong> ", to$region, "<br/> ",
-                     "<strong> Estado: </strong> ", to$state, "<br/> ",
-                     "<strong> Nombre: </strong> ", to$company_na, "<br/> ",
-                     "<strong> Latitud: </strong> ", to$lat, "<br/> ",
-                     "<strong> Longitud: </strong> ", to$LONG, "<br/> ",
-                     "<strong> Dirección: </strong> ", to$long, "<br/> ",
-                     "<strong> Telefono: </strong> ", to$phone, "<br/> ",
-                     "<strong> Correo: </strong> ", to$email, "<br/> ") %>%
+to$labels1 <- paste0(
+  "<h3 style= 'background-color:tomato; color: black; text-align: center; font-size: 130%; font-family:verdana'> Operator </h3>", 
+                     "<b style= 'color:red'> Región: </b> ", to$region, "<br/> ",
+                     "<b style= 'color:red'> Estado: </b> ", to$state, "<br/> ",
+                     "<b style= 'color:red'> Nombre: </b> ", to$company_na, "<br/> ",
+                     "<b style= 'color:red'> Latitud: </b> ", to$lat, "<br/> ",
+                     "<b style= 'color:red'> Longitud: </b> ", to$LONG, "<br/> ",
+                     "<b style= 'color:red'> Dirección: </b> ", to$long, "<br/> ",
+                     "<b style= 'color:red'> Telefono: </b> ", to$phone, "<br/> ",
+                     "<b style= 'color:red'> Correo: </b> ", to$email, "<br/> ") %>%
         lapply(htmltools::HTML)
 
-ds$labels2 <- paste0("<strong> Nombre sitio: </strong> ", ds$site_name, "<br/> ",
-                     "<strong> Región: </strong> ", ds$region, "<br/> ",
-                     "<strong> Localidad: </strong> ", ds$locality, "<br/> ",
-                     "<strong> Estado: </strong> ", ds$state, "<br/> ",
-                     "<strong> Popularidad: </strong> ", ds$popularity, "<br/> ",
-                     "<strong> Latitud: </strong> ", ds$latitude, "<br/> ",
-                     "<strong> Longitud: </strong> ", ds$longitude, "<br/> ") %>%
+ds$labels2 <- paste0(
+  "<h3 style= 'background-color:powderblue; color: black; text-align: center; font-size: 130%; font-family:verdana'> Diving Site </h3>", 
+                     "<b style= 'color:red'> Nombre: </b> ", ds$site_name, "<br/> ",
+                     "<b style= 'color:red'> Región: </b> ", ds$region, "<br/> ",
+                     "<b style= 'color:red'> Localidad: </b> ", ds$locality, "<br/> ",
+                     "<b style= 'color:red'> Estado: </b> ", ds$state, "<br/> ",
+                     "<b style= 'color:red'> Popularidad: </b> ", ds$popularity, "<br/> ",
+                     "<b style= 'color:red'> Latitud: </b> ", ds$latitude, "<br/> ",
+                     "<b style= 'color:red'> Longitud: </b> ", ds$longitude, "<br/> ") %>%
         lapply(htmltools::HTML)
 
 
-mpa$labels3 <- paste0("<strong> Name: </strong> ", mpa$ANP, "<br/> ",
-                      "<strong> Plan de Manejo: </strong> ", mpa$PM_link, "<br/> ",
-                      "<strong> Fecha: </strong> ", mpa$FECHA, "<br/> ",
-                      "<strong> Zona: </strong> ", mpa$Categor, "<br/> ",
-                      "<strong> Subzona </strong> ", mpa$Subznfc, "<br/> ",
-                      "<strong> Buceo: </strong> ", mpa$Buceo, "<br/> ",
-                      "<strong> Pesca: </strong> ", mpa$Pesca, "<br/> ") %>%
+mpa$labels3 <- paste0("<style> div.leaflet-popup-content {width:auto !important;}</style>",
+  "<h3 style= 'background-color:#14c794; color: black; text-align: center; font-size: 130%; font-family:verdana'> AMP </h3>", 
+                      "<b style= 'color:red'> Nombre: </b> ", mpa$ANP, "<br/> ",
+                      "<b style= 'color:red'>Plan de Manejo: </b> ", mpa$PM_link, "<br/> ",
+                      "<b style= 'color:red'>Fecha: </b> ", mpa$FECHA, "<br/> ",
+                      "<b style= 'color:red'> Zona: </b> ", mpa$Categor, "<br/> ",
+                      "<b style= 'color:red'> Subzona </b> ", mpa$Subznfc, "<br/> ",
+                      "<b style= 'color:red'> Buceo: </b> ", mpa$Buceo, "<br/> ",
+                      "<b style= 'color:red'> Pesca: </b> ", mpa$Pesca, "<br/> ") %>%
         lapply(htmltools::HTML)
 
 #Create a diving flag as marker
@@ -109,16 +116,16 @@ leaflet(to) %>%
                 weight = 2,
                 opacity = 1,
 
-                fillColor = "white",
-                fillOpacity = 0.1,
-                color = "black",
+                fillColor = "magma",
+                fillOpacity = 0.3,
+                color = "#bf0a0a",
                 dashArray = "2",
                 highlightOptions = highlightOptions(
-                        color = "white",
+                        color = "#06d611",
                         weight = 2,
                         bringToFront = TRUE
                 ),
-                popup = ~ labels3
+                popup = ~ labels3 
         ) %>%
         addMarkers(
                 icon=diverIcon,#Add diving flag as marker
