@@ -111,7 +111,9 @@ leaflet(to) %>%
         addProviderTiles(providers$Esri.WorldTopoMap, group = "Mapa") %>%
         addProviderTiles(providers$Esri.OceanBasemap, group = "Océano") %>%
 
-        setView(lng = -108, lat = 25, zoom = 2) %>%
+        setView(lat =  21.601093,
+                lng = -100.739661,
+                zoom = 5) %>%
         addMarkers(
                 popup = ~ labels1,
                 group = "Operadores",
@@ -148,11 +150,12 @@ leaflet(to) %>%
                 options = layersControlOptions(collapsed = TRUE)
         ) %>%
         hideGroup(c("Operadores", "Sitios de Buceo")) %>%
-        setView(lng = -99.1332,
-                lat = 19.4326,
-                zoom = 4) %>% 
-#addProviderTiles(providers$Esri.WorldStreetMap) %>%
-  addMiniMap()
+        setView(lat =  21.601093,
+                lng = -100.739661,
+                zoom = 5) %>% 
+
+
+    addMiniMap()
 
 
 ```
