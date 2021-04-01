@@ -39,7 +39,7 @@ library(viridis)
 # Loading diving site data and diving operators data ----------------
 
 ds <- raster::shapefile("shp/Diving_sites_v1.0_01032021/dive_sites.shp", verbose = FALSE)
-to <- raster::shapefile("shp/Tourism_operators_v1.0_01032021/operators.shp", verbose = FALSE)
+to <- raster::shapefile("shp/Tourism_operators_v1.0_01032021/operators.shp",encoding = "latin1", verbose = FALSE)
 
 # Loading MPA layer -------------------
 mpa <- raster::shapefile("shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.shp", encoding = "latin1")
@@ -49,47 +49,56 @@ mpa <- raster::shapefile("shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.shp", encoding = 
 
 ```{r}
 
+
+
+
 to$labels1 <- paste0(
   "<h3 style= 'background-color:tomato; color: black; text-align: center; font-size: 130%; font-family:verdana'> Operator </h3>", 
-                     "<b style= 'color:red'> Región: </b> ", to$region, "<br/> ",
-                     "<b style= 'color:red'> Estado: </b> ", to$state, "<br/> ",
-                     "<b style= 'color:red'> Nombre: </b> ", to$company_na, "<br/> ",
-                     "<b style= 'color:red'> Latitud: </b> ", to$lat, "<br/> ",
-                     "<b style= 'color:red'> Longitud: </b> ", to$LONG, "<br/> ",
-                     "<b style= 'color:red'> Dirección: </b> ", to$long, "<br/> ",
-                     "<b style= 'color:red'> Telefono: </b> ", to$phone, "<br/> ",
-                     "<b style= 'color:red'> Correo: </b> ", to$email, "<br/> ") %>%
+                     "<b style= 'color:#263270'> Región: </b> ", to$region, "<br/> ",
+                     "<b style= 'color:#263270'> Estado: </b> ", to$state, "<br/> ",
+                     "<b style= 'color:#263270'> Nombre: </b> ", to$company_na, "<br/> ",
+                     "<b style= 'color:#263270'> Latitud: </b> ", to$lat, "<br/> ",
+                     "<b style= 'color:#263270'> Longitud: </b> ", to$long, "<br/> ",
+                     "<b style= 'color:#263270'> Dirección: </b> ", to$address, "<br/> ",
+                     "<b style= 'color:#263270'> Telefono: </b> ", to$phone, "<br/> ",
+                     "<b style= 'color:#263270'> Correo: </b> ", to$email, "<br/> ") %>%
         lapply(htmltools::HTML)
 
 ds$labels2 <- paste0(
   "<h3 style= 'background-color:powderblue; color: black; text-align: center; font-size: 130%; font-family:verdana'> Diving Site </h3>", 
-                     "<b style= 'color:red'> Nombre: </b> ", ds$site_name, "<br/> ",
-                     "<b style= 'color:red'> Región: </b> ", ds$region, "<br/> ",
-                     "<b style= 'color:red'> Localidad: </b> ", ds$locality, "<br/> ",
-                     "<b style= 'color:red'> Estado: </b> ", ds$state, "<br/> ",
-                     "<b style= 'color:red'> Popularidad: </b> ", ds$popularity, "<br/> ",
-                     "<b style= 'color:red'> Latitud: </b> ", ds$latitude, "<br/> ",
-                     "<b style= 'color:red'> Longitud: </b> ", ds$longitude, "<br/> ") %>%
+                     "<b style= 'color:#263270'> Nombre: </b> ", ds$site_name, "<br/> ",
+                     "<b style= 'color:#263270'> Región: </b> ", ds$region, "<br/> ",
+                     "<b style= 'color:#263270'> Localidad: </b> ", ds$locality, "<br/> ",
+                     "<b style= 'color:#263270'> Estado: </b> ", ds$state, "<br/> ",
+                     "<b style= 'color:#263270'> Popularidad: </b> ", ds$popularity, "<br/> ",
+                     "<b style= 'color:#263270'> Latitud: </b> ", ds$latitude, "<br/> ",
+                     "<b style= 'color:#263270'> Longitud: </b> ", ds$longitude, "<br/> ") %>%
         lapply(htmltools::HTML)
 
 
-mpa$labels3 <- paste0("<style> div.leaflet-popup-content {width:auto !important;}</style>",
-  "<h3 style= 'background-color:#14c794; color: black; text-align: center; font-size: 130%; font-family:verdana'> AMP </h3>", 
-                      "<b style= 'color:red'> Nombre: </b> ", mpa$ANP, "<br/> ",
-                      "<b style= 'color:red'>Plan de Manejo: </b> ", mpa$PM_link, "<br/> ",
-                      "<b style= 'color:red'>Fecha: </b> ", mpa$FECHA, "<br/> ",
-                      "<b style= 'color:red'> Zona: </b> ", mpa$Categor, "<br/> ",
-                      "<b style= 'color:red'> Subzona </b> ", mpa$Subznfc, "<br/> ",
-                      "<b style= 'color:red'> Buceo: </b> ", mpa$Buceo, "<br/> ",
-                      "<b style= 'color:red'> Pesca: </b> ", mpa$Pesca, "<br/> ") %>%
+mpa$labels3 <- paste0("<h3 style= 'background-color:#14c794; color: black; text-align: center; font-size: 130%; font-family:verdana'> AMP </h3>", 
+                      "<b style= 'color:#263270'> Nombre: </b> ", mpa$ANP, "<br/> ",
+                      "<b style= 'color:#263270'>Plan de Manejo: </b> ", "<a href =\"", mpa$PM_link, "\", target=\"_blank\"> PDF </a>" ,   "<br/> ",
+                      "<b style= 'color:#263270'>Fecha: </b> ", mpa$FECHA, "<br/> ",
+                      "<b style= 'color:#263270'> Zona: </b> ", mpa$Categor, "<br/> ",
+                      "<b style= 'color:#263270'> Subzona </b> ", mpa$Subznfc, "<br/> ",
+                      "<b style= 'color:#263270'> Buceo: </b> ", mpa$Buceo, "<br/> ",
+                      "<b style= 'color:#263270'> Pesca: </b> ", mpa$Pesca, "<br/> ") %>%
         lapply(htmltools::HTML)
 
-#Create a diving flag as marker
+#Create Diving Sites' marker
 diverIcon <- makeIcon(
-  iconUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/ICS_Diver.svg/280px-ICS_Diver.svg.png",
-  iconWidth = 20, iconHeight = 20,
+  iconUrl = "data/Media/diver.png",
+  iconWidth = 30, iconHeight = 30,
   iconAnchorX = 0, iconAnchorY = 0 
 )
+#Create Operators' marker
+operIcon <- makeIcon(
+  iconUrl = "data/Media/scuba.png",
+  iconWidth = 40, iconHeight = 40,
+  iconAnchorX = 0, iconAnchorY = 0 
+)
+
 
 icons <- awesomeIcons(
         icon = 'flag-outline',
@@ -103,12 +112,10 @@ leaflet(to) %>%
         addProviderTiles(providers$Esri.OceanBasemap, group = "Ocean") %>%
 
         setView(lng = -108, lat = 25, zoom = 2) %>%
-        addAwesomeMarkers(
+        addMarkers(
                 popup = ~ labels1,
                 group = "Operators",
-                icon = awesomeIcons(icon = "home",
-                                    markerColor = "darkred",
-                                    library = "ion")
+                icon = operIcon
         ) %>%
         addPolygons(
                 data = mpa,
@@ -125,7 +132,7 @@ leaflet(to) %>%
                         weight = 2,
                         bringToFront = TRUE
                 ),
-                popup = ~ labels3 
+                popup = ~ labels3, 
         ) %>%
         addMarkers(
                 icon=diverIcon,#Add diving flag as marker
@@ -182,4 +189,10 @@ This work is part of the diving atlas initiative in Mexico, a project where inte
 - Marisol Placencia de la Cruz (CBMC); 
 - Octavio Aburto Oropeza (SIO); 
 - Catalina López Sagastégui (UC-Mexus);
+
+Testing
+=======================================================================
+
+
+
 
