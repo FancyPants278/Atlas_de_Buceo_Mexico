@@ -13,6 +13,12 @@ resource_files:
 - "shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.shx" 
 - "shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.prj" 
 - "shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.dbf" 
+- "shp/ADVALC/360_shape ADVC vigentes_19FEB.cpg"
+- "shp/ADVALC/360_shape ADVC vigentes_19FEB.dbf"
+- "shp/ADVALC/360_shape ADVC vigentes_19FEB.prj"
+- "shp/ADVALC/360_shape ADVC vigentes_19FEB.sbn"
+- "shp/ADVALC/360_shape ADVC vigentes_19FEB.sbx"
+- "shp/ADVALC/360_shape ADVC vigentes_19FEB.shx"
 css: styles.css
 
 runtime: shiny
@@ -86,7 +92,6 @@ mpa <- raster::shapefile("shp/MPA_MX_v1.0_01032021/MPA_MX_c1-0.shp", encoding = 
 #Loading voluntary conservation areas layer
 
 voluntary <- raster::shapefile("shp/Areas_destinadas_voluntariamente_a_la_conservacion/360_shape ADVC vigentes_19FEB.shp", encoding = "latin1", verbose= FALSE)
- 
 
 
 ```
@@ -613,7 +618,7 @@ renderPlot({
                       legend.title = element_text(face="bold", size = 25,family="Times New Roman"),
                       plot.background = element_rect(fill="#c4c4c4", colour="#c4c4c4"))})
 
-unique(test$)
+
 ```
 
 
@@ -743,26 +748,26 @@ Resumen
 =======================================================================
 
 
-```{r graph_5, fig.height=5, fig.width=7}
+```{r graph_6, fig.height=5, fig.width=7}
 summary <- mpa %>% 
   as.data.frame() %>% 
   select(ANP, Pesca, Buceo) %>% 
   mutate(Buceo = factor(Buceo, levels = c("No especificado", "Sin manejo", "Prohibido", "Permitido"))) %>%
   mutate(Pesca = factor(Buceo, levels = c("No especificada", "Sin manejo", "Prohibida", "Permitida")))
 
-(p1 <- summary%>% 
-                group_by(Buceo) %>% 
-                count() %>% 
-                filter(!is.na(Buceo)) %>% 
-                ggplot(aes(x= reorder(Buceo, n), y = n,  fill = Buceo))+
-                geom_col()+
+renderPlot({ summary%>% 
+               group_by(Buceo) %>% 
+               count() %>% 
+            filter(!is.na(Buceo)) %>% 
+              ggplot(aes(x= reorder(Buceo, n), y = n,  fill = Buceo))+
+               geom_col()+
                 scale_fill_manual(values = c( "#fee391", "gray30","firebrick", "#005a32"), name = "Nivel de Protección") +
                 theme_ipsum() +
                 labs(x = "", y = "Numero de sitios de buceo") +
                 theme(strip.text.x = element_text(angle = 0, hjust = .5),
                 axis.text.x = element_blank(), 
-                legend.position = "bottom"))
-p1
+ legend.position = "bottom") })
+
 ```
 
 
