@@ -167,20 +167,52 @@ EEZ <- 3269386
         theme_ipsum() +
         theme(legend.position = ""))
 
-area_sub <- final_mpa %>%                
-                select(ID, ANP, Pesca) %>% 
-                mutate(Area = set_units(st_area(.), km^2)) %>% 
-                group_by(ANP, Pesca) %>% 
-                summarise(Area = sum(Area)) %>%
-                as.data.frame() %>%  
-                select(-geometry) %>% 
-                mutate(Area_dbl = as.double(Area)) %>% 
-                mutate(Area_perc_eez = (Area_dbl/EEZ)*100) %>%
-                mutate(EEZ = "EEZ area") %>% 
-                filter(Pesca != "No especificado") %>% 
-                ungroup() %>% 
-                mutate(tot_perc = sum(Area_perc_eez)) %>% 
-                add_row(Pesca = "EEZ", Area = NA, Area_dbl = 3269386, Area_perc_eez = 100 - 21.78272, EEZ = "EEZ area", tot_perc = 100)  
+area <- final_mpa %>%                 
+        select(ID, Pesca) %>% 
+        mutate(Area = set_units(st_area(.), km^2)) %>% 
+        group_by(Pesca) %>% 
+        summarise(Area = sum(Area)) %>%
+        as.data.frame() %>% 
+        select(-geometry) %>% 
+        mutate(Area_dbl = as.double(Area)) %>% 
+        mutate(Area_perc_eez = (Area_dbl/EEZ)*100) %>%
+        mutate(EEZ = rep("EEZ area", 4)) %>% 
+        filter(Pesca != "No especificado") %>% 
+        ungroup() %>% 
+        mutate(tot_perc = sum(Area_perc_eez)) %>%
+        # mutate(val=c("6","1","3","9")) %>% 
+add_row(Pesca = "No Protegido", Area = NA, Area_dbl = 3269386, Area_perc_eez = 100 - 21.78272, EEZ = "EEZ area", tot_perc = 100)  
+vec <- c("#edb72f","#b22222","#558019","#4d4d4d")
+area <- cbind(area, color=vec)
+
+
+p <- c("#edb72f", "gray30", "firebrick", "#558019")
+treemap::treemap(area,
+                 index="Pesca",
+                 vSize="Area_perc_eez",
+                 vColor="Pesca",
+                 type="index",
+                 # title.legend = "Pesca",
+                 fontsize.labels = 33,
+                 fontcolor.labels = "white",
+                 fontface.labels = 1,
+                 fontfamily.labels = "Times New Roman",
+                 #align.labels = "center",
+                 overlap.labels = 1,
+                 inflate.labels=FALSE,
+                 title = "Área Total: ZEE mexicana",
+                 fontfamily.title = "Times New Roman",
+                 fontsize.title = 36,
+                 border.col=c("black", "white"),
+                 border.lwds=c(5,2),
+                 palette= "Spectral",
+                 mapping=c(1,9),
+                 force.print.labels = FALSE,
+                 xmod.labels = 0,
+                 bg.labels = c("white"),
+                 position.legend = "bottom",
+                 fontfamily.legend = "Times New Roman",
+                 fontsize.legend = 33)
 
 
 tm <- treemap::treemap(area_sub,
@@ -210,6 +242,9 @@ tm <- treemap::treemap(area_sub,
                  fontsize.legend = 20)    
 inter <- d3Tree::d3tree(tm)
 inter
+plotly::ggplotly(tm)
+
+
 
 ggsave('figs/Total_protected_area.png', dpi = 300, height = 6, width = 4)
 
